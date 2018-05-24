@@ -37,7 +37,7 @@ System.out.println(responseBody.toString());
 
 ```
 
-## Creating and Updating user
+## Get, Create and Update user
 To create a user you must provide an `id` and a `name`. You can optionally provide an `avatar_url (String)` and `custom_data (Map<String,String>)`.
 
 ```java
@@ -45,7 +45,7 @@ To create a user you must provide an `id` and a `name`. You can optionally provi
 String userId = "someuser"; 
 Map<String, Object> data = new HashMap<>();
 Map<String, String> customData = new HashMap<>();
-customData.put("email", getEmail());
+customData.put("email", "someuser@example.com");
 
 data.put("id", userId);
 data.put("name", "Some User");
@@ -59,6 +59,21 @@ try{
     }else{
         chatKit.updateUser(data);
     }
+}catch(Exception e){
+    System.out.println(e.getMessage());
+}
+
+```
+
+## Delete user
+To delete user you just need to provide user ID.
+
+```java
+
+String userId = "someuser"; 
+
+try{
+    ApiResponse apiResponse = chatKit.deleteUser(data);
 }catch(Exception e){
     System.out.println(e.getMessage());
 }
