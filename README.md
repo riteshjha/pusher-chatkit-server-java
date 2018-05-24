@@ -73,7 +73,7 @@ To delete user you just need to provide user ID.
 String userId = "someuser"; 
 
 try{
-    ApiResponse apiResponse = chatKit.deleteUser(data);
+    ApiResponse apiResponse = chatKit.deleteUser(userId);
 }catch(Exception e){
     System.out.println(e.getMessage());
 }
