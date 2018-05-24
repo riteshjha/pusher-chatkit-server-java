@@ -47,7 +47,6 @@ Map<String, Object> data = new HashMap<>();
 Map<String, String> customData = new HashMap<>();
 customData.put("email", "someuser@example.com");
 
-data.put("id", userId);
 data.put("name", "Some User");
 data.put("avatar_url", "avatar url");
 data.put("custom_data", customData);
@@ -55,9 +54,9 @@ data.put("custom_data", customData);
 try{
     ApiResponse apiResponse = chatKit.getUser(userId); //check user already created
     if(apiResponse.getStatus() == 404){
-        chatKit.createUser(data);
+        chatKit.createUser(userId, data);
     }else{
-        chatKit.updateUser(data);
+        chatKit.updateUser(userId, data);
     }
 }catch(Exception e){
     System.out.println(e.getMessage());
@@ -74,6 +73,29 @@ String userId = "someuser";
 
 try{
     ApiResponse apiResponse = chatKit.deleteUser(userId);
+}catch(Exception e){
+    System.out.println(e.getMessage());
+}
+
+```
+
+## Create Room
+To create a room you must provide the ID of the user that is creating the room.
+
+```java
+
+String createrId = "someuser"; 
+Map<String, Object> data = new HashMap<>();
+List<String> userIds = new HashMap<>();
+userIds.add("seth");
+userIds.add("ritesh");
+
+data.put("name", "Room Name"); //optional
+data.put("private", false); //optional
+data.put("user_ids", userIds); //optional
+
+try{
+    chatKit.createRoom(createrId, data);
 }catch(Exception e){
     System.out.println(e.getMessage());
 }
