@@ -88,7 +88,7 @@ To create a room you must provide the ID of the user that is creating the room.
 
 String createrId = "someuser"; 
 Map<String, Object> data = new HashMap<>();
-List<String> userIds = new HashMap<>();
+List<String> userIds = new ArrayList<>();
 userIds.add("seth");
 userIds.add("ritesh");
 
