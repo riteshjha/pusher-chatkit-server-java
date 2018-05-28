@@ -1,7 +1,7 @@
 # Pusher Chatkit JAVA Server SDK
-Find out more about Chatkit [here](https://pusher.com/chatkit){:target="_blank"}.
+Find out more about Chatkit [here](https://pusher.com/chatkit).
 
-Find out the details documentation for this library [here](https://riteshjha.github.io/pusher-chatkit-server-java){:target="_blank"}.
+Find out the details documentation for this library [here](https://riteshjha.github.io/pusher-chatkit-server-java).
 
 ## Installation
 Place the jar file from dist folder to your project lib folder.
