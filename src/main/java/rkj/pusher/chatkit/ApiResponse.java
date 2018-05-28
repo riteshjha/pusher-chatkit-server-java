@@ -12,6 +12,9 @@ import org.json.JSONObject;
 public class ApiResponse extends JSONObject {
    
 
+    /**
+     * Construct Api response with default 400 http status code 
+     */
     public ApiResponse(){
         try{
             this.put("status", 400);
@@ -21,7 +24,7 @@ public class ApiResponse extends JSONObject {
 
     /**
      * Set Api https status code
-     * @param Integer status
+     * @param  status http code
      * @return ApiResponse
      */
     public ApiResponse setStatus(Integer status){
@@ -33,7 +36,7 @@ public class ApiResponse extends JSONObject {
 
     /**
      * Set Api response message
-     * @param String message
+     * @param  message set api response message or error
      * @return ApiResponse
      */
     public ApiResponse setMessage(String message){
@@ -45,8 +48,8 @@ public class ApiResponse extends JSONObject {
 
     /**
      * Set Api payload
-     * @param String key
-     * @param String value
+     * @param key payload key
+     * @param value payload value
      * @return ApiResponse
      */
     public ApiResponse setPayload(String key, Object value){

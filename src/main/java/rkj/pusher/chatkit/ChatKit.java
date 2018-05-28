@@ -18,13 +18,12 @@ import io.jsonwebtoken.Jwts;
 
 
 /**
- * Pusher Chatkit Java Server SDK
- * Map<String, String> options = new HashMap<>()
- * options.put("instanceLocator", "");
- * options.put("key", "");
- * options.put("expireIn", ""); //value should be in seconds, this is optional, default one day
- * ChatKit chatkit = new ChatKit(options);
- * 
+ * Pusher Chatkit Java Server SDK <br/>
+ * Map<String, String> options = new HashMap<>()<br/>
+ * options.put("instanceLocator", ""); // instance locator from chatkit dashboard<br/>
+ * options.put("key", ""); // key from chatkit dashboard<br/>
+ * options.put("expireIn", ""); //value should be in seconds, this is optional, default one day<br/>
+ * ChatKit chatkit = new ChatKit(options);<br/>
  * @author Ritesh Jha (mailrkj@gmail.com)
  * @version 0.0.1
  */
@@ -39,11 +38,11 @@ public class ChatKit {
 
     /**
      * Instantiate Class with Options
-     * @param Map options      Options to configure the Chatkit instance.
-     *                         instanceLocator - your Chatkit instance locator
-     *                         key - your Chatkit instance's key
-     *                         expireIn (optional) - your Chatkit instance's key
-     * 
+     * @param options      Options to configure the Chatkit instance.
+     *                     instanceLocator - your Chatkit instance locator
+     *                     key - your Chatkit instance's key
+     *                     expireIn (optional) - your Chatkit instance's key
+     * @throws Exception if instanceLocator or key is not available
      */
     public ChatKit(Map<String, String> options) throws Exception {
 
@@ -77,7 +76,7 @@ public class ChatKit {
 
     /**
      * Convert Minute to Java Date
-     * @param Long minute
+     * @param seconds duration in seconds
      * @return Date
      */
     protected Date getDateFromMinute(long seconds) {
@@ -88,8 +87,9 @@ public class ChatKit {
 
     /**
      * Main Get api request
-     * @param String service
-     * @return JsonResponse
+     * @param service api service name
+     * @throws Exception internal throw exception if any api error
+     * @return ApiResponse
      */
     protected ApiResponse apiRequest(String service) throws Exception {
         return apiRequest(service, "get", null);
@@ -97,10 +97,11 @@ public class ChatKit {
 
     /**
      * Main api request
-     * @param String service
-     * @param String method
-     * @param Map requestData
-     * @return
+     * @param service api service name
+     * @param method http method
+     * @param requestData request data 
+     * @throws Exception internal throw exception if any api error
+     * @return ApiResponse
      */
     protected ApiResponse apiRequest(String service, String method, Map<String, Object> requestData) throws Exception {
         String requestUrl = apiEndPoint + service;
@@ -126,8 +127,9 @@ public class ChatKit {
 
     /**
      * Chatkit Get request api
-     * @param String requestUrl
-     * @return JsonResponse 
+     * @param requestUrl chatkit request url
+     * @throws Exception internal throw exception if any api error
+     * @return ApiResponse 
      */
     protected ApiResponse getRequest(String requestUrl) throws Exception {
         GetRequest getRequest = Unirest.get(requestUrl);
@@ -142,10 +144,12 @@ public class ChatKit {
 
 
     /**
-     * Handle CHatkit POST api
-     * @param String requestUrl
-     * @param Map requestData
-     * @return JsonResponse | null
+     * Handle Chatkit POST api
+     * @param requestUrl chatkit request url
+     * @param requestData request data
+     * @param method http method
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse | null
      */
     protected ApiResponse requestWithBody(String requestUrl, Map<String, Object> requestData, String method) throws Exception {
         HttpRequestWithBody requestWithBody = null;
@@ -174,8 +178,9 @@ public class ChatKit {
 
     /**
      * Handle Chatkit Api response
-     * @param HttpResponse<com.mashape.unirest.http.JsonNode response
-     * @return JsonResponse
+     * @param response unirest response in format  HttpResponse<com.mashape.unirest.http.JsonNode>
+     * @throws JSONException if json format exception found
+     * @return ApiResponse
      */
     protected ApiResponse handleResponse(HttpResponse<JsonNode> response) throws JSONException {
         //System.out.println("Status => " + response.getStatus());
@@ -197,7 +202,8 @@ public class ChatKit {
 
     /**
      * Format chatkit response data
-     * @param com.mashape.unirest.http.JsonNode responseBody
+     * @param responseBody response body in com.mashape.unirest.http.JsonNode
+     * @throws JSONException if json format exception found
      * @return null | Object
      */
     protected Object handleResponseData(JsonNode responseBody) throws JSONException {
@@ -217,8 +223,9 @@ public class ChatKit {
 
     /**
      * Sample method to construct a JWT
-     * @param String subject
-     * @param boolen su
+     * @param userId JWT subject, here userId
+     * @param su chatkit generate admin token or note (true | false)
+     * @return String return JWT
      */
     protected String generateToken( String userId, boolean su) {
 
@@ -254,7 +261,7 @@ public class ChatKit {
     }
 
     /**
-     * Generate Admin token
+     * Generate Admin token with userId
      * @return String
      */
     protected String serverToken(){
@@ -262,9 +269,19 @@ public class ChatKit {
     }
 
     /**
+     * Generate Admin token
+     * @param userId chatkit user id
+     * @return String
+     */
+    protected String serverToken(String userId){
+        return generateToken(userId, true);
+    }
+
+    /**
      * Autenticate chatkit user
-     * @param String userId
-     * @return JsonResponse
+     * @param userId chatkit user id
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
      */
     public ApiResponse authenticate( String userId ) throws Exception {
         if(userId == null){
@@ -283,9 +300,31 @@ public class ChatKit {
     }
 
     /**
+     * Get Chatkit users
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
+     */
+    public ApiResponse getUsers() throws Exception {
+        token = serverToken();
+        return apiRequest("users");
+    }
+
+    /**
+     * Get Chatkit users by ids
+     * @param ids chatkit user ids
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
+     */
+    public ApiResponse getUsers(List<String> ids) throws Exception {
+        token = serverToken();
+        return apiRequest("users_by_ids?user_ids=" + String.join(",", ids));
+    }
+
+    /**
      * Get Chatkit user
-     * @param String userId
-     * @return JsonResponse
+     * @param userId chatkit user id
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
      */
     public ApiResponse getUser(String userId) throws Exception {
         token = serverToken();
@@ -294,9 +333,10 @@ public class ChatKit {
 
      /**
      * Create Chatkit user
-     * @param String userId
-     * @param Map data
-     * @return JsonResponse
+     * @param userId chatkit user id
+     * @param data request data
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
      */
     public ApiResponse createUser(String userId, Map<String, Object> data) throws Exception {
         token = serverToken();
@@ -315,9 +355,10 @@ public class ChatKit {
 
     /**
      * Update Chatkit user
-     * @param String userId
-     * @param Map data
-     * @return JsonResponse
+     * @param userId chatkit user id
+     * @param data request data
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
      */
     public ApiResponse updateUser(String userId, Map<String, Object> data) throws Exception {
 
@@ -325,14 +366,15 @@ public class ChatKit {
             throw new Exception("You must provide an id");
         }
 
-        token = generateToken(userId, true);
+        token = serverToken(userId);
         return apiRequest("users/"+ userId, "put", data);
     }
 
     /**
      * Delete Chatkit user
-     * @param String userId
-     * @return JsonResponse
+     * @param userId chatkit user id
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
      */
     public ApiResponse deleteUser(String userId) throws Exception {
         token = serverToken();
@@ -340,10 +382,43 @@ public class ChatKit {
     }
 
     /**
+     * Chatkit get user rooms
+     * @param userId chatkit user id
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
+     */
+    public ApiResponse getUserRooms(String userId) throws Exception {
+
+        if (userId == null ) {
+            throw new Exception("You must provide the id of the user that you wish to fetch the room list");
+        }
+
+        token = serverToken(userId);
+        return apiRequest("users/"+userId+"/rooms");
+    }
+
+     /**
+     * Chatkit get user joinable rooms
+     * @param userId chatkit user id
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
+     */
+    public ApiResponse getUserJoinableRooms(String userId) throws Exception {
+
+        if (userId == null ) {
+            throw new Exception("You must provide the id of the user that you wish to fetch the room list");
+        }
+
+        token = serverToken(userId);
+        return apiRequest("users/"+userId+"/rooms?joinable=true");
+    }
+
+    /**
      * Create chatkit room
-     * @param String creatorId
-     * @param Map data
-     * @return JsonResponse
+     * @param creatorId chatkit user id
+     * @param data request data
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
      */
     public ApiResponse createRoom(String creatorId, Map<String, Object> data) throws Exception {
 
@@ -351,8 +426,15 @@ public class ChatKit {
             throw new Exception("You must provide the id of the user that you wish to create the room");
         }
 
+        if (data == null || !data.containsKey("name") || data.get("name").toString().length() == 0 ) {
+            throw new Exception("You must provide a room name");
+        }
+
         data.put("creator_id", creatorId);
-        token = generateToken(creatorId, true);
+        token = serverToken(creatorId);
         return apiRequest("rooms", "post", data);
-    }    
+    }
+
+    
 }
+
