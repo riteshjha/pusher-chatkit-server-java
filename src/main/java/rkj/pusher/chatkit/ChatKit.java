@@ -38,9 +38,9 @@ public class ChatKit {
 
     /**
      * Instantiate Class with Options
-     * @param options      Options to configure the Chatkit instance.
-     *                     instanceLocator - your Chatkit instance locator
-     *                     key - your Chatkit instance's key
+     * @param options      Options to configure the Chatkit instance.<br/>
+     *                     instanceLocator - your Chatkit instance locator<br/>
+     *                     key - your Chatkit instance's key<br/>
      *                     expireIn (optional) - your Chatkit instance's key
      * @throws Exception if instanceLocator or key is not available
      */
