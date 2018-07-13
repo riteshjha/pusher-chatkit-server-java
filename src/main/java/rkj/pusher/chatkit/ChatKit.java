@@ -298,11 +298,11 @@ public class ChatKit {
     }
 
     /**
-     * Generate Admin token with userId
+     * Generate Admin token with default Admin user
      * @return String
      */
     protected String serverToken(){
-        String adminUser = AppGlobals.pusherInfo().get("chatKitAdmin");
+        String adminUser = "1"; //default 
         return generateToken(adminUser, true);
     }
 
