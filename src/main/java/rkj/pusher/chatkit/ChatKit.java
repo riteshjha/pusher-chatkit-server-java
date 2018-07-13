@@ -13,7 +13,6 @@ import java.util.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import io.jsonwebtoken.SignatureAlgorithm;
-import utils.AppGlobals;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 
