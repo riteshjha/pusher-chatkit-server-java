@@ -1,4 +1,4 @@
-package rkj.pusher.chatkit;
+package utils.pusher;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -13,17 +13,24 @@ import java.util.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import io.jsonwebtoken.SignatureAlgorithm;
+import utils.AppGlobals;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 
 
 /**
- * Pusher Chatkit Java Server SDK <br/>
- * Map<String, String> options = new HashMap<>()<br/>
- * options.put("instanceLocator", ""); // instance locator from chatkit dashboard<br/>
- * options.put("key", ""); // key from chatkit dashboard<br/>
- * options.put("expireIn", ""); //value should be in seconds, this is optional, default one day<br/>
- * ChatKit chatkit = new ChatKit(options);<br/>
+ * Pusher Chatkit Java Server SDK
+ * <p>
+ * Map<String, String> options = new HashMap<>()
+ * <p>
+ * options.put("instanceLocator", "");
+ * <p>
+ * options.put("key", "");
+ * <p>
+ * options.put("expireIn", ""); //value should be in seconds, this is optional, default one day
+ * <p>
+ * ChatKit chatkit = new ChatKit(options);
+ * <p>
  * @author Ritesh Jha (mailrkj@gmail.com)
  * @version 0.0.1
  */
@@ -38,9 +45,9 @@ public class ChatKit {
 
     /**
      * Instantiate Class with Options
-     * @param options      Options to configure the Chatkit instance.<br/>
-     *                     instanceLocator - your Chatkit instance locator<br/>
-     *                     key - your Chatkit instance's key<br/>
+     * @param options      Options to configure the Chatkit instance.
+     *                     instanceLocator - your Chatkit instance locator
+     *                     key - your Chatkit instance's key
      *                     expireIn (optional) - your Chatkit instance's key
      * @throws Exception if instanceLocator or key is not available
      */
@@ -93,6 +100,17 @@ public class ChatKit {
      */
     protected ApiResponse apiRequest(String service) throws Exception {
         return apiRequest(service, "get", null);
+    }
+
+    /**
+     * Main Get api request
+     * @param service api service name
+     * @param method http method
+     * @throws Exception internal throw exception if any api error
+     * @return ApiResponse
+     */
+    protected ApiResponse apiRequest(String service, String method) throws Exception {
+        return apiRequest(service, method, null);
     }
 
     /**
@@ -221,13 +239,28 @@ public class ChatKit {
         }
     }
 
+    protected String generateRefreshToken(String userId, boolean su){
+        return generateToken(userId, su, true);
+    }
+
     /**
      * Sample method to construct a JWT
      * @param userId JWT subject, here userId
      * @param su chatkit generate admin token or note (true | false)
-     * @return String return JWT
+     * @return String return JWT access token
      */
     protected String generateToken( String userId, boolean su) {
+        return generateToken(userId, su, false);
+    }
+
+    /**
+     * Sample method to construct a JWT
+     * @param userId JWT subject, here userId
+     * @param su chatkit generate admin token or note (true | false)
+     * @param refresh chatkit generate refresh token or note (true | false)
+     * @return String return JWT access token
+     */
+    private String generateToken( String userId, boolean su, boolean refresh) {
 
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
@@ -257,6 +290,10 @@ public class ChatKit {
             builder.claim("su", true);
         }
 
+        if (refresh){
+            builder.claim("refresh", true);
+        }
+
         return builder.compact();
     }
 
@@ -265,7 +302,8 @@ public class ChatKit {
      * @return String
      */
     protected String serverToken(){
-        return generateToken(null, true);
+        String adminUser = AppGlobals.pusherInfo().get("chatKitAdmin");
+        return generateToken(adminUser, true);
     }
 
     /**
@@ -289,10 +327,13 @@ public class ChatKit {
         } 
 
         String accessToken = generateToken(userId, false);
+        String refreshToken = generateRefreshToken(userId, false);
+
         ApiResponse responseBody = new ApiResponse();
         responseBody.setStatus(200)
                     .setPayload("access_token", accessToken)
                     .setPayload("token_type", "access_token")
+                    .setPayload("refresh_token", refreshToken)
                     .setPayload("expires_in", (long) expireIn.getTime()/1000)
                     .setPayload("user_id", userId);
     
@@ -382,6 +423,17 @@ public class ChatKit {
     }
 
     /**
+     * Chatkit get all rooms specially for admin
+     * @param userId chatkit user id
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
+     */
+    public ApiResponse getAllRooms() throws Exception {
+        token = serverToken();
+        return apiRequest("rooms");
+    }
+
+    /**
      * Chatkit get user rooms
      * @param userId chatkit user id
      * @throws Exception internal throw exception if any api error 
@@ -435,6 +487,49 @@ public class ChatKit {
         return apiRequest("rooms", "post", data);
     }
 
-    
+    /**
+     * Delete Chatkit room
+     * @param roomId chatkit user id
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
+     */
+    public ApiResponse deleteRoom(String roomId) throws Exception {
+
+        if (roomId == null ) {
+            throw new Exception("You must provide the room id");
+        }
+        token = serverToken();
+        return apiRequest("rooms/"+ roomId, "delete");
+    }
+
+    /**
+     * Fetch chatkit room message
+     * @param roomId chatkit room id
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
+     */
+    public ApiResponse fetchMessages(String roomId, String userId) throws Exception {
+
+        if (roomId == null ) {
+            throw new Exception("You must provide the room id");
+        }
+        token = serverToken(userId);
+        return apiRequest("rooms/"+roomId+"/messages");
+    }
+
+    /**
+     * Chatkit delete message
+     * @param messageId chatkit message id
+     * @throws Exception internal throw exception if any api error 
+     * @return ApiResponse
+     */
+    public ApiResponse deleteMessage(String messageId) throws Exception {
+
+        if (messageId == null ) {
+            throw new Exception("You must provide the message id");
+        }
+        token = serverToken();
+        return apiRequest("messages/"+ messageId, "delete");
+    }
 }
 
