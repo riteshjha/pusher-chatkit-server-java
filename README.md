@@ -6,6 +6,10 @@ Find out the details documentation for this library [here](https://riteshjha.git
 ## Installation
 Place the jar file from dist folder to your project lib folder.
 
+OR
+
+mvn package
+
 ## Chatkit Instance
 Go to your pusher chatkit dashboard and find your `instance_locator` and `key` and use it to create Chatkit instance
 
